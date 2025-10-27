@@ -95,6 +95,10 @@ npm run lint
 | `JWT_REFRESH_DAYS` | Refresh token lifetime (days) | `7` |
 | `POSTGRES_*` | Database bootstrap variables | – |
 | `VITE_API_BASE` | API base URL for frontend build | `http://localhost:8000` |
+| `BACKEND_PUBLISHED_PORT` | Optional fixed host port for backend (production compose) | `0` *(random)* |
+| `FRONTEND_PUBLISHED_PORT` | Optional fixed host port for frontend (production compose) | `0` *(random)* |
+
+> **Production tip:** When deploying on Coolify (or any public host), change the values that include `localhost` so they match your live domains. Set `FRONTEND_ORIGIN` and `CSRF_TRUSTED_ORIGINS` to the HTTPS origin that serves the React app, point `REDIRECT_BASE_URL` at the domain you want users to visit for short links, and keep `DJANGO_ALLOWED_HOSTS` in sync with the backend/API domains you have mapped in Coolify. The `VITE_API_BASE` build argument must also reference the public API URL so the compiled frontend calls the right host.
 
 > **Production tip:** When deploying on Coolify (or any public host), change the values that include `localhost` so they match your live domains. Set `FRONTEND_ORIGIN` and `CSRF_TRUSTED_ORIGINS` to the HTTPS origin that serves the React app, point `REDIRECT_BASE_URL` at the domain you want users to visit for short links, and keep `DJANGO_ALLOWED_HOSTS` in sync with the backend/API domains you have mapped in Coolify. The `VITE_API_BASE` build argument must also reference the public API URL so the compiled frontend calls the right host. In Coolify, map each domain to the internal container ports (backend `8000`, frontend `8080`) and let the platform choose the external port automatically.
 
