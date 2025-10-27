@@ -30,10 +30,6 @@ services:
       - redis
     expose:
       - "8000"
-    ports:
-      - target: 8000
-        published: ${BACKEND_PUBLISHED_PORT:-0}
-        protocol: tcp
 
   frontend:
     build:
@@ -45,10 +41,6 @@ services:
       - backend
     expose:
       - "8080"
-    ports:
-      - target: 8080
-        published: ${FRONTEND_PUBLISHED_PORT:-0}
-        protocol: tcp
 
 volumes:
   postgres_data:
