@@ -180,7 +180,7 @@ The UI is responsive, dark-themed, and optimized for desktop or mobile devices.
 ## Coolify deployment
 
 1. Push this repository to a Git provider accessible by Coolify.
-2. In Coolify, create a new **Docker Compose** application and select the repo. The platform will automatically pick up the root `docker-compose.yml`, which already points at the `urlshort/backend` and `urlshort/frontend` folders for build contexts.
+2. In Coolify, create a new **Docker Compose** application and select the repo. The platform will automatically pick up the root `docker-compose.yml`, which builds from the repository root while explicitly referencing the Django and React Dockerfiles inside `urlshort/backend` and `urlshort/frontend`.
 3. Provide the environment variables by copying `.env.example` into `urlshort/.env` (or by adding them through Coolify’s interface). The compose file references that location by default.
 4. Deploy the stack – Coolify will build four services: backend, frontend, Postgres, and Redis.
 5. Map domains:
