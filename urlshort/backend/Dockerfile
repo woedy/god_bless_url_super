@@ -9,10 +9,10 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends build-essential libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-COPY urlshort/backend/requirements.txt ./requirements.txt
+COPY requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY urlshort/backend/ ./
+COPY . ./
 
 ENV DJANGO_SETTINGS_MODULE=core.settings
 
