@@ -25,12 +25,15 @@ services:
       DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-*}
       REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
       REDIRECT_BASE_URL: ${REDIRECT_BASE_URL:-http://localhost:8000}
-      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:8080}
     depends_on:
       - db
       - redis
     expose:
       - "8000"
+    ports:
+      - target: 8000
+        published: ${BACKEND_PUBLISHED_PORT:-0}
+        protocol: tcp
 
   frontend:
     build:
@@ -42,6 +45,10 @@ services:
       - backend
     expose:
       - "8080"
+    ports:
+      - target: 8080
+        published: ${FRONTEND_PUBLISHED_PORT:-0}
+        protocol: tcp
 
 volumes:
   postgres_data:

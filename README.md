@@ -45,8 +45,8 @@ Visit the apps:
 - API root: <http://localhost:8000/api>
 - Django admin: <http://localhost:8000/admin>
 
-> **Why the `docker-compose.local.yml` file?**  
-> The root `docker-compose.yml` is tuned for Coolify and no longer publishes host ports, so other applications on the same server can coexist. The `.local` override keeps developer-friendly ports exposed for day-to-day work.
+> **Why the `docker-compose.local.yml` file?**
+> The root `docker-compose.yml` is tuned for Coolify and lets Docker auto-assign host ports (so other applications on the same server can coexist). The `.local` override keeps predictable ports exposed for day-to-day work.
 
 ### Live-reload development stack
 
@@ -95,6 +95,10 @@ npm run lint
 | `JWT_REFRESH_DAYS` | Refresh token lifetime (days) | `7` |
 | `POSTGRES_*` | Database bootstrap variables | – |
 | `VITE_API_BASE` | API base URL for frontend build | `http://localhost:8000` |
+| `BACKEND_PUBLISHED_PORT` | Optional fixed host port for backend (production compose) | `0` *(random)* |
+| `FRONTEND_PUBLISHED_PORT` | Optional fixed host port for frontend (production compose) | `0` *(random)* |
+
+> **Production tip:** When deploying on Coolify (or any public host), change the values that include `localhost` so they match your live domains. Set `FRONTEND_ORIGIN` and `CSRF_TRUSTED_ORIGINS` to the HTTPS origin that serves the React app, point `REDIRECT_BASE_URL` at the domain you want users to visit for short links, and keep `DJANGO_ALLOWED_HOSTS` in sync with the backend/API domains you have mapped in Coolify. The `VITE_API_BASE` build argument must also reference the public API URL so the compiled frontend calls the right host.
 
 ## API reference
 
@@ -183,11 +187,11 @@ The UI is responsive, dark-themed, and optimized for desktop or mobile devices.
 1. Push this repository to a Git provider accessible by Coolify.
 2. In Coolify, create a new **Docker Compose** application and select the repo. The platform will automatically pick up the root `docker-compose.yml`, which builds each service from the `backend/` and `frontend/` directories now located at the repository root.
 3. Provide the environment variables through Coolify’s interface (or by supplying a custom `.env` file if you mount one). The compose file reads environment variables directly from the service configuration, so Coolify-managed environment variables are sufficient.
-4. Deploy the stack – Coolify will build four services: backend, frontend, Postgres, and Redis. The production compose file now uses `expose` instead of `ports`, allowing Coolify to auto-assign host ports without clashing with other applications on the same server.
+4. Deploy the stack – Coolify will build four services: backend, frontend, Postgres, and Redis. The production compose file publishes container ports 8000/8080 with `published: 0`, allowing Docker (and by extension Coolify) to pick free host ports automatically.
 5. Map domains:
-   - `api.example.com` → backend container port 8000 (host port is assigned automatically)
-   - `go.example.com` → backend container port 8000 (same service handles redirects; host port is assigned automatically)
-   - `app.example.com` → frontend container port 8080 (host port is assigned automatically)
+   - `api.example.com` → backend container port 8000 (Coolify proxies to the auto-assigned host port)
+   - `go.example.com` → backend container port 8000 (same service handles redirects)
+   - `app.example.com` → frontend container port 8080 (Coolify proxies to the auto-assigned host port)
 6. Enable HTTPS on each domain via Coolify’s managed certificates.
 7. After the first deploy, run migrations and create a user:
    ```bash
