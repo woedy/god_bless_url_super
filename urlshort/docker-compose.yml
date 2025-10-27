@@ -21,8 +21,10 @@ services:
 
   backend:
     build:
-      context: ./backend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: backend/Dockerfile
+      args:
+        BACKEND_DIR: backend
     command: gunicorn core.wsgi:application --bind 0.0.0.0:8000
     env_file: .env
     environment:
@@ -35,9 +37,10 @@ services:
 
   frontend:
     build:
-      context: ./frontend
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: frontend/Dockerfile
       args:
+        FRONTEND_DIR: frontend
         VITE_API_BASE: ${VITE_API_BASE:-http://localhost:8000}
     depends_on:
       - backend
