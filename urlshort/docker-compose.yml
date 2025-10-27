@@ -1,0 +1,48 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-urlshort}
+      POSTGRES_USER: ${POSTGRES_USER:-urlshort}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-urlshort}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+  backend:
+    build:
+      context: ..
+      dockerfile: urlshort/backend/Dockerfile
+    command: gunicorn core.wsgi:application --bind 0.0.0.0:8000
+    env_file: .env
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgres://urlshort:urlshort@db:5432/urlshort}
+    depends_on:
+      - db
+      - redis
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: urlshort/frontend/Dockerfile
+      args:
+        VITE_API_BASE: ${VITE_API_BASE:-http://localhost:8000}
+    depends_on:
+      - backend
+    ports:
+      - "8080:8080"
+
+volumes:
+  postgres_data:
