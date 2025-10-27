@@ -21,10 +21,8 @@ services:
 
   backend:
     build:
-      context: .
-      dockerfile: urlshort/backend/Dockerfile
-      args:
-        BACKEND_DIR: urlshort/backend
+      context: ./urlshort/backend
+      dockerfile: Dockerfile
     command: gunicorn core.wsgi:application --bind 0.0.0.0:8000
     environment:
       DATABASE_URL: ${DATABASE_URL:-postgres://urlshort:urlshort@db:5432/urlshort}
@@ -37,10 +35,9 @@ services:
 
   frontend:
     build:
-      context: .
-      dockerfile: urlshort/frontend/Dockerfile
+      context: ./urlshort/frontend
+      dockerfile: Dockerfile
       args:
-        FRONTEND_DIR: urlshort/frontend
         VITE_API_BASE: ${VITE_API_BASE:-http://localhost:8000}
     depends_on:
       - backend
