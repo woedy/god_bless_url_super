@@ -14,13 +14,15 @@ A production-ready URL shortener that bulk-generates unique short links, protect
 ## Repository layout
 
 ```
-urlshort/
-├── backend/          # Django project (core) + shortener app and tests
-├── frontend/         # React application built with Vite and Tailwind
-├── docker-compose.yml
-├── docker-compose.local.yml
-├── .env.example
-└── README.md
+.
+├── docker-compose.yml   # Root-level compose that targets the backend/frontend subdirectories
+└── urlshort/
+    ├── backend/         # Django project (core) + shortener app and tests
+    ├── frontend/        # React application built with Vite and Tailwind
+    ├── docker-compose.yml
+    ├── docker-compose.local.yml
+    ├── .env.example
+    └── README.md
 ```
 
 ## Getting started locally
@@ -178,8 +180,8 @@ The UI is responsive, dark-themed, and optimized for desktop or mobile devices.
 ## Coolify deployment
 
 1. Push this repository to a Git provider accessible by Coolify.
-2. In Coolify, create a new **Docker Compose** application and select the repo.
-3. Provide the environment variables by copying `.env.example` (adjust domains, secrets, database credentials).
+2. In Coolify, create a new **Docker Compose** application and select the repo. The platform will automatically pick up the root `docker-compose.yml`, which already points at the `urlshort/backend` and `urlshort/frontend` folders for build contexts.
+3. Provide the environment variables by copying `.env.example` into `urlshort/.env` (or by adding them through Coolify’s interface). The compose file references that location by default.
 4. Deploy the stack – Coolify will build four services: backend, frontend, Postgres, and Redis.
 5. Map domains:
    - `api.example.com` → backend container port 8000
