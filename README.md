@@ -15,14 +15,12 @@ A production-ready URL shortener that bulk-generates unique short links, protect
 
 ```
 .
-├── docker-compose.yml   # Root-level compose that targets the backend/frontend subdirectories
-└── urlshort/
-    ├── backend/         # Django project (core) + shortener app and tests
-    ├── frontend/        # React application built with Vite and Tailwind
-    ├── docker-compose.yml
-    ├── docker-compose.local.yml
-    ├── .env.example
-    └── README.md
+├── backend/                 # Django project (core) + shortener app and tests
+├── frontend/                # React application built with Vite and Tailwind
+├── docker-compose.yml       # Production-ready stack (Postgres, Redis, backend, frontend)
+├── docker-compose.local.yml # Live-reload developer experience
+├── .env.example             # Environment variable template
+└── README.md
 ```
 
 ## Getting started locally
@@ -30,12 +28,11 @@ A production-ready URL shortener that bulk-generates unique short links, protect
 ### Prerequisites
 
 - Docker and Docker Compose
-- Make a copy of the environment file inside the `urlshort/` folder: `cd urlshort && cp .env.example .env`
+- Make a copy of the environment file at the repository root: `cp .env.example .env`
 
 ### Boot the stack
 
 ```bash
-cd urlshort
 cp .env.example .env
 docker compose up -d --build
 docker compose exec backend python manage.py migrate
@@ -53,7 +50,6 @@ Visit the apps:
 For interactive development with auto-reloading Django and the Vite dev server, run the local compose file instead:
 
 ```bash
-cd urlshort
 docker compose -f docker-compose.local.yml up --build
 ```
 
@@ -64,14 +60,13 @@ This configuration mounts your local source code into the containers, exposes th
 Backend unit tests cover the code generator, bulk creation pipeline, and redirect logging.
 
 ```bash
-cd urlshort
 docker compose exec backend python manage.py test
 ```
 
 Frontend linting (optional during local development):
 
 ```bash
-cd urlshort/frontend
+cd frontend
 npm install
 npm run lint
 ```
@@ -183,8 +178,8 @@ The UI is responsive, dark-themed, and optimized for desktop or mobile devices.
 ## Coolify deployment
 
 1. Push this repository to a Git provider accessible by Coolify.
-2. In Coolify, create a new **Docker Compose** application and select the repo. The platform will automatically pick up the root `docker-compose.yml`, which builds from the repository root while explicitly referencing the Django and React Dockerfiles inside `urlshort/backend` and `urlshort/frontend`.
-3. Provide the environment variables through Coolify’s interface (or by supplying a custom `.env` file if you mount one). The root compose no longer requires a `urlshort/.env` file, so Coolify-managed environment variables are sufficient.
+2. In Coolify, create a new **Docker Compose** application and select the repo. The platform will automatically pick up the root `docker-compose.yml`, which builds each service from the `backend/` and `frontend/` directories now located at the repository root.
+3. Provide the environment variables through Coolify’s interface (or by supplying a custom `.env` file if you mount one). The compose file reads environment variables directly from the service configuration, so Coolify-managed environment variables are sufficient.
 4. Deploy the stack – Coolify will build four services: backend, frontend, Postgres, and Redis.
 5. Map domains:
    - `api.example.com` → backend container port 8000

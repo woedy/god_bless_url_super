@@ -21,14 +21,15 @@ services:
 
   backend:
     build:
-      context: .
-      dockerfile: urlshort/backend/Dockerfile
-      args:
-        BACKEND_DIR: urlshort/backend
+      context: ./backend
+      dockerfile: Dockerfile
     command: gunicorn core.wsgi:application --bind 0.0.0.0:8000
     environment:
       DATABASE_URL: ${DATABASE_URL:-postgres://urlshort:urlshort@db:5432/urlshort}
       DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-*}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379/0}
+      REDIRECT_BASE_URL: ${REDIRECT_BASE_URL:-http://localhost:8000}
+      FRONTEND_URL: ${FRONTEND_URL:-http://localhost:8080}
     depends_on:
       - db
       - redis
@@ -37,10 +38,9 @@ services:
 
   frontend:
     build:
-      context: .
-      dockerfile: urlshort/frontend/Dockerfile
+      context: ./frontend
+      dockerfile: Dockerfile
       args:
-        FRONTEND_DIR: urlshort/frontend
         VITE_API_BASE: ${VITE_API_BASE:-http://localhost:8000}
     depends_on:
       - backend
