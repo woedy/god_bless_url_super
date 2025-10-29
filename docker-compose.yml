@@ -4,11 +4,14 @@ services:
   backend:
     build:
       context: ./backend
-    env_file: .env
     environment:
       DATABASE_URL: ${DATABASE_URL:-postgres://urlshort:urlshort@db:5432/urlshort}
       RATE_LIMIT_REDIS_URL: ${RATE_LIMIT_REDIS_URL:-redis://redis:6379/0}
       REDIRECT_BASE_URL: ${REDIRECT_BASE_URL:-http://backend:8000}
+    ports:
+      - target: 8000
+        published: ${BACKEND_PUBLISHED_PORT:-0}
+        protocol: tcp
     depends_on:
       db:
         condition: service_healthy
@@ -22,9 +25,12 @@ services:
       context: ./frontend
       args:
         VITE_API_BASE: ${VITE_API_BASE:-http://backend:8000}
-    env_file: .env
     environment:
       VITE_API_BASE: ${VITE_API_BASE:-http://backend:8000}
+    ports:
+      - target: 80
+        published: ${FRONTEND_PUBLISHED_PORT:-0}
+        protocol: tcp
     depends_on:
       - backend
 
