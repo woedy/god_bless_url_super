@@ -6,7 +6,7 @@ import LinksTable from './components/LinksTable';
 import StatsModal from './components/StatsModal';
 import { useAuth } from './hooks/useAuth';
 import type { LinkDto, LinkStatsResponse } from './lib/api';
-import { bulkCreateLinks, fetchLinks, fetchStats } from './lib/api';
+import { bulkCreateLinks, deleteLink, fetchLinks, fetchStats } from './lib/api';
 
 interface ToastState {
   type: 'success' | 'error';
@@ -82,6 +82,36 @@ export default function App() {
         setStatsOpen(true);
       } catch (err) {
         showToast({ type: 'error', message: err instanceof Error ? err.message : 'Unable to load stats' });
+      }
+    },
+    [token, showToast]
+  );
+
+  const handleDeleteLink = useCallback(
+    async (link: LinkDto) => {
+      if (!token) {
+        showToast({ type: 'error', message: 'Sign in to delete links.' });
+        return;
+      }
+
+      const confirmed = window.confirm(
+        `Delete ${link.short_url}? This action cannot be undone.`
+      );
+
+      if (!confirmed) {
+        return;
+      }
+
+      try {
+        await deleteLink(token, link.code);
+        setLinks((prev) => prev.filter((item) => item.id !== link.id));
+        setGenerated((prev) => prev.filter((item) => item.id !== link.id));
+        showToast({ type: 'success', message: 'Link deleted.' });
+      } catch (err) {
+        showToast({
+          type: 'error',
+          message: err instanceof Error ? err.message : 'Unable to delete the link.'
+        });
       }
     },
     [token, showToast]
@@ -175,7 +205,13 @@ export default function App() {
           </section>
 
           <section className="flex flex-col gap-4">
-            <LinksTable links={links} loading={loadingLinks} onRefresh={loadLinks} onShowStats={handleShowStats} />
+            <LinksTable
+              links={links}
+              loading={loadingLinks}
+              onRefresh={loadLinks}
+              onShowStats={handleShowStats}
+              onDelete={handleDeleteLink}
+            />
             <div className="rounded-xl bg-slate-900 p-6 shadow-xl">
               <h3 className="text-lg font-semibold text-slate-100">Tips</h3>
               <ul className="mt-3 space-y-2 text-sm text-slate-400">

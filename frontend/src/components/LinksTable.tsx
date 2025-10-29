@@ -7,9 +7,10 @@ interface LinksTableProps {
   loading?: boolean;
   onRefresh: () => void;
   onShowStats: (link: LinkDto) => void;
+  onDelete: (link: LinkDto) => void | Promise<void>;
 }
 
-export default function LinksTable({ links, loading, onRefresh, onShowStats }: LinksTableProps) {
+export default function LinksTable({ links, loading, onRefresh, onShowStats, onDelete }: LinksTableProps) {
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
   const [copiedGroup, setCopiedGroup] = useState<string | null>(null);
   const [search, setSearch] = useState('');
@@ -189,6 +190,13 @@ export default function LinksTable({ links, loading, onRefresh, onShowStats }: L
                         className="rounded border border-brand px-3 py-1 text-xs font-semibold text-brand hover:bg-brand/10"
                       >
                         Stats
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => void onDelete(link)}
+                        className="rounded border border-rose-500 px-3 py-1 text-xs font-semibold text-rose-200 hover:bg-rose-500/10"
+                      >
+                        Delete
                       </button>
                     </div>
                   </li>

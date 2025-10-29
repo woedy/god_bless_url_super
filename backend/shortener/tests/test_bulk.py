@@ -55,3 +55,24 @@ class BulkCreateLinksTests(APITestCase):
         response = self.client.get(reverse("link-list"), {"search": "other"})
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(len(response.json()), 1)
+
+    def test_delete_link_removes_owned_link(self):
+        link = Link.objects.create(
+            owner=self.user,
+            code="delete12",
+            target_url="https://example.com/to-remove",
+        )
+
+        response = self.client.delete(reverse("link-detail", kwargs={"code": link.code}))
+
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+        self.assertFalse(Link.objects.filter(pk=link.pk).exists())
+
+    def test_delete_link_for_other_user_returns_not_found(self):
+        other = User.objects.create_user(username="carol", password="password")
+        link = Link.objects.create(owner=other, code="keep123", target_url="https://example.com/keep")
+
+        response = self.client.delete(reverse("link-detail", kwargs={"code": link.code}))
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertTrue(Link.objects.filter(pk=link.pk).exists())

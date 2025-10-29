@@ -38,6 +38,15 @@ class LinkListView(generics.ListAPIView):
         return queryset
 
 
+class LinkDetailView(generics.DestroyAPIView):
+    serializer_class = LinkSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    lookup_field = "code"
+
+    def get_queryset(self):
+        return Link.objects.filter(owner=self.request.user)
+
+
 class BulkCreateLinksView(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
 

@@ -96,3 +96,23 @@ export async function fetchStats(token: string, code: string): Promise<LinkStats
   });
   return parseResponse<LinkStatsResponse>(res);
 }
+
+export async function deleteLink(token: string, code: string): Promise<void> {
+  const res = await fetch(`${API_BASE}/api/links/${code}/`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  });
+
+  if (!res.ok) {
+    let message = 'Failed to delete link';
+    try {
+      const data = await res.json();
+      message = data.detail || data.message || JSON.stringify(data);
+    } catch (err) {
+      // ignore json parse errors
+    }
+    throw new Error(message);
+  }
+}
